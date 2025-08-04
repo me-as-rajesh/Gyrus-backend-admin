@@ -137,7 +137,7 @@ router.get('/:groupId', async (req, res) => {
     res.json({ success: true, data: group });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ success: false, error: 'Server error' });
+    res.status(500).json({ success: false, error: 'Server error' });  
   }
 });
 
