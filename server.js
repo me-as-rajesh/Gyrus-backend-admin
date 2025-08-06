@@ -3,12 +3,17 @@ require('dotenv').config();
 const mongoose = require('mongoose');
 const app = require('./app');
 
-// MongoDB Connection for localhost
-mongoose.connect('mongodb://localhost:27017/gyrus', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-.then(() => console.log('Connected to MongoDB 👍 (localhost:27017/gyrus)'))
+// // MongoDB Connection for localhost
+// mongoose.connect('mongodb://localhost:27017/gyrus', {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true
+// })
+// .then(() => console.log('Connected to MongoDB 👍 (localhost:27017/gyrus)'))
+// .catch(err => console.error('MongoDB connection error:', err));
+
+// MongoDB Connection using environment variable
+mongoose.connect(process.env.MONGODB_URI)
+.then(() => console.log('Connected to MongoDB 👍'))
 .catch(err => console.error('MongoDB connection error:', err));
 
 // Start server
