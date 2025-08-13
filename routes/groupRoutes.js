@@ -30,7 +30,7 @@ router.post('/', async (req, res) => {
       section,
       teacherEmail,
       students: students || [],
-      maxStudents: req.body.maxStudents || 20
+      maxStudents: req.body.maxStudents || 100
     });
 
     await newGroup.save();
@@ -141,7 +141,6 @@ router.get('/:groupId', async (req, res) => {
   }
 });
 
-
 // @desc    Update group
 // @route   PUT /api/groups/:id
 // @access  Private
@@ -171,7 +170,13 @@ router.put('/:id', async (req, res) => {
           attempted: students.length
         });
       }
-      group.students = students;
+      group.students = students.map(student => ({
+        name: student.name,
+        regNo: student.regNo,
+        email: student.email,
+        gender: student.gender,
+        dob: student.dob
+      }));
     }
 
     const updatedGroup = await group.save();

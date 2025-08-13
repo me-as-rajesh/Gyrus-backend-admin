@@ -10,6 +10,23 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Registration number is required'],
     trim: true
+  },
+  email: {
+    type: String,
+    required: [true, 'Student email is required'],
+    trim: true,
+    match: [/^[^\s@]+@[^\s@]+\.[^\s@]+$/, 'Please enter a valid email']
+  },
+  gender: {
+    type: String,
+    required: [true, 'Gender is required'],
+    enum: ['Male', 'Female', 'Other'],
+    trim: true
+  },
+  dob: {
+    type: Date,
+    required: [true, 'Date of Birth is required'],
+    trim: true
   }
 }, { _id: false });
 
@@ -25,7 +42,7 @@ const groupSchema = new mongoose.Schema({
     enum: ['11', '12'],
     trim: true
   },
-  teacherEmail: {  // Changed from teacherId (ObjectId) to teacherEmail (String)
+  teacherEmail: {  
     type: String,
     required: [true, 'Teacher email is required'],
     ref: 'Teacher',
@@ -34,9 +51,9 @@ const groupSchema = new mongoose.Schema({
   students: [studentSchema],
   maxStudents: {
     type: Number,
-    default: 20,
+    default: 100,
     min: [1, 'Maximum students must be at least 1'],
-    max: [20, 'Maximum students cannot exceed 20']
+    max: [100, 'Maximum students cannot exceed 100']
   },
   currentStudentCount: {
     type: Number,
@@ -58,13 +75,16 @@ groupSchema.pre('save', function(next) {
   next();
 });
 
-// Validate unique registration numbers within group
-groupSchema.pre('save', function(next) {
-  const regNos = this.students.map(s => s.regNo);
-  if (new Set(regNos).size !== regNos.length) {
-    throw new Error('Duplicate registration numbers in group');
-  }
-  next();
-});
+
+//groupSchema.index({ 'students.regNo': 1 }, { unique: false });
+
+// Commented out the unique regNo validation to allow duplicates
+// groupSchema.pre('save', function(next) {
+//   const regNos = this.students.map(s => s.regNo);
+//   if (new Set(regNos).size !== regNos.length) {
+//     throw new Error('Duplicate registration numbers in group');
+//   }
+//   next();
+// });
 
 module.exports = mongoose.model('Group', groupSchema);
