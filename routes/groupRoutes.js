@@ -9,13 +9,13 @@ const mongoose = require('mongoose');
 // @access  Private
 router.post('/', async (req, res) => {
   try {
-    const { groupName, section, teacherEmail, students } = req.body;
+    const { groupName, class: classValue, section, teacherEmail, students } = req.body;
 
     // Validation
-    if (!groupName || !section || !teacherEmail) {
+    if (!groupName || !classValue || !section || !teacherEmail) {
       return res.status(400).json({
         error: 'Missing required fields',
-        required: ['groupName', 'section', 'teacherEmail']
+        required: ['groupName', 'class', 'section', 'teacherEmail']
       });
     }
 
@@ -27,6 +27,7 @@ router.post('/', async (req, res) => {
 
     const newGroup = new Group({
       groupName,
+      class: classValue,
       section,
       teacherEmail,
       students: students || [],
@@ -151,7 +152,7 @@ router.put('/:id', async (req, res) => {
       return res.status(400).json({ error: 'Invalid group ID format' });
     }
 
-    const { groupName, section, students } = req.body;
+    const { groupName, class: classValue, section, students } = req.body;
     const group = await Group.findById(req.params.id);
 
     if (!group) {
@@ -160,6 +161,7 @@ router.put('/:id', async (req, res) => {
 
     // Update fields
     if (groupName) group.groupName = groupName;
+    if (classValue) group.class = classValue;
     if (section) group.section = section;
     if (students) {
       // Validate before updating students

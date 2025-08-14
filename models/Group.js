@@ -36,10 +36,16 @@ const groupSchema = new mongoose.Schema({
     required: [true, 'Group name is required'],
     trim: true
   },
+  class: {
+    type: String,
+    required: [true, 'Class is required'],
+    enum: ['11', '12'],
+    trim: true
+  },
   section: {
     type: String,
     required: [true, 'Section is required'],
-    enum: ['11', '12'],
+    match: [/^[A-Z]$/, 'Section must be a single uppercase letter A-Z'],
     trim: true
   },
   teacherEmail: {  
@@ -74,7 +80,6 @@ groupSchema.pre('save', function(next) {
   }
   next();
 });
-
 
 //groupSchema.index({ 'students.regNo': 1 }, { unique: false });
 
