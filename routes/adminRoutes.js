@@ -145,7 +145,8 @@ router.get('/allstudents', async (req, res) => {
         ...student,
         groupId: group._id,
         groupName: group.groupName,
-        section: group.section
+        section: group.section,
+        class: group.class || group.section || '-'
       })));
     }, []);
     res.json(allStudents);

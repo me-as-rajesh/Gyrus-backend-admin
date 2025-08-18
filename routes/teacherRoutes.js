@@ -6,7 +6,7 @@ const router = express.Router();
 // POST /api/teachers/join-request - Create teacher join request
 router.post('/join-request', async (req, res) => {
   try {
-    const { name, email, dob, department, password, phone, school, profileImage } = req.body;
+    const { name, email, dob, department, password, phone, school } = req.body;
     
     if (!name || !email || !dob || !department || !password) {
       return res.status(400).json({ 
@@ -47,7 +47,6 @@ router.post('/join-request', async (req, res) => {
       password: hashedPassword,
       phone,
       school,
-      profileImage,
       status: 'pending'
     });
 
