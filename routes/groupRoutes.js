@@ -48,6 +48,36 @@ router.post('/', async (req, res) => {
   }
 });
 
+// @desc    Get all student emails for groups created by a specific teacher
+// @route   GET /api/groups/teacher/:email/students
+// @access  Private
+router.get('/teacher/:email/students', async (req, res) => {
+  try {
+    const groups = await Group.find({ teacherEmail: req.params.email })
+      .populate('students', 'name email dob');
+
+    if (!groups || groups.length === 0) {
+      return res.status(404).json({ error: 'No groups found for this teacher' });
+    }
+
+    const allStudents = groups.reduce((acc, group) => {
+      return acc.concat(group.students.map(student => ({
+        name: student.name,
+        email: student.email,
+        dob: student.dob ? new Date(student.dob).toLocaleDateString() : null
+      })));
+    }, []);
+
+    if (allStudents.length === 0) {
+      return res.status(404).json({ error: 'No students found in the teacher\'s groups' });
+    }
+
+    res.json(allStudents);
+  } catch (err) {
+    handleError(res, err);
+  }
+});
+
 // @desc    Get all groups
 // @route   GET /api/groups
 // @access  Public
