@@ -49,14 +49,14 @@ router.post('/contact-admin', async (req, res) => {
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: process.env.COMPANY_EMAIL,
+        pass: process.env.COMPANY_PASSWORD,
       },
     });
 
     let mailOptions = {
       from: email,
-      to: process.env.EMAIL_USER,
+      to: process.env.COMPANY_EMAIL,
       subject: `New Contact Message from ${name}`,
       text: `
       Name: ${name}

@@ -2,7 +2,27 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const Teacher = require('../models/Teacher');
 const router = express.Router();
+const nodemailer = require("nodemailer");
+const crypto = require("crypto");
+const jwt = require('jsonwebtoken');
 
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.COMPANY_EMAIL,
+    pass: process.env.COMPANY_PASSWORD,
+  },
+});
+
+const otpStore = {};
+
+function generateOTP() {
+  return crypto.randomInt(100000, 999999).toString(); // 6-digit OTP
+}
+
+function setOTPExpiry() {
+  return Date.now() + 5 * 60 * 1000; // 5 minutes
+}
 // POST /api/teachers/join-request - Create teacher join request
 router.post('/join-request', async (req, res) => {
   try {
@@ -94,7 +114,6 @@ router.get('/join-requests/pending', async (req, res) => {
   }
 });
 
-// LOGIN - POST /api/teachers/login (modified to check status)
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -123,11 +142,70 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.status(200).json(teacher);
+    // Generate and store OTP
+    const otp = generateOTP();
+    const expires = setOTPExpiry();
+    otpStore[email] = { otp, expires };
+
+    // Send OTP via email
+    await transporter.sendMail({
+      from: process.env.COMPANY_EMAIL,
+      to: email,
+      subject: "Your Teacher Login OTP",
+      text: `Hello Teacher, your 6-digit OTP is: ${otp}. It expires in 5 minutes.`,
+    });
+
+    // Return success but require OTP next (e.g., frontend prompts for OTP)
+    res.status(200).json({ 
+      message: 'OTP sent to your email. Please enter it to complete login.',
+      email: email // For frontend to know which email
+    });
+
   } catch (error) {
+    console.error("Login error:", error);
     res.status(500).json({ error: 'Server error' });
   }
 });
+
+// New route: POST /api/teachers/verify-otp (to complete login after OTP)
+router.post('/verify-otp', async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+      return res.status(400).json({ error: 'Email and OTP required' });
+    }
+
+    const stored = otpStore[email];
+    if (!stored || Date.now() > stored.expires) {
+      return res.status(401).json({ error: 'Invalid or expired OTP' });
+    }
+
+    if (stored.otp !== otp) {
+      return res.status(401).json({ error: 'Invalid OTP' });
+    }
+
+    // Clear OTP
+    delete otpStore[email];
+
+    // Generate JWT token (as in original nodeMail.js)
+    const token = jwt.sign({ email, role: 'teacher' }, process.env.JWT_SECRET, { expiresIn: '1h' });
+
+    // Fetch teacher data (exclude password)
+    const teacher = await Teacher.findOne({ email }).select('-password');
+
+    res.status(200).json({ 
+      message: 'Login successful',
+      token,
+      teacher 
+    });
+
+  } catch (error) {
+    console.error("OTP verification error:", error);
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 
 // READ ALL - GET /api/teachers
 router.get('/', async (req, res) => {
