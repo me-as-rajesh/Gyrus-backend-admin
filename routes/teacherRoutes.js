@@ -7,12 +7,15 @@ const crypto = require("crypto");
 const jwt = require('jsonwebtoken');
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465,
+  secure: true, // true for port 465
   auth: {
     user: process.env.COMPANY_EMAIL,
-    pass: process.env.COMPANY_PASSWORD,
+    pass: process.env.COMPANY_PASSWORD, // use an App Password, not your normal Gmail password
   },
 });
+
 
 const otpStore = {};
 
@@ -21,7 +24,7 @@ function generateOTP() {
 }
 
 function setOTPExpiry() {
-  return Date.now() + 5 * 60 * 1000; // 5 minutes
+  return Date.now() + 10 * 60 * 1000; // 10 minutes
 }
 // POST /api/teachers/join-request - Create teacher join request
 router.post('/join-request', async (req, res) => {
@@ -152,16 +155,14 @@ router.post('/login', async (req, res) => {
       from: process.env.COMPANY_EMAIL,
       to: email,
       subject: "Your One-Time Password (OTP) for Login",
-      text: `Dear Teacher,
-
-Your secure 6-digit OTP is: ${otp}
-
-Please use this code to complete your login. It will expire in 5 minutes for security reasons.
-
-If you did not request this OTP, please ignore this message.
-
-Best regards,  
-The Team`,
+      html: `<div style="font-family:sans-serif;">
+        <p>Dear Teacher,</p>
+        <p>Your secure 6-digit OTP is: <b style="font-size:1.2em;">${otp}</b></p>
+        <p>Please use this code to complete your login. It will expire in <b>10 minutes</b> for security reasons.</p>
+        <p>If you did not request this OTP, please ignore this message.</p>
+        <br>
+        <p>Best regards,<br>The Team Gyrus NEET</p>
+      </div>`
     });
 
 
