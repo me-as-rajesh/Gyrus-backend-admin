@@ -27,9 +27,9 @@ function setOTPExpiry() {
 router.post('/join-request', async (req, res) => {
   try {
     const { name, email, dob, department, password, phone, school } = req.body;
-    
+
     if (!name || !email || !dob || !department || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Missing required fields',
         details: {
           name: !name ? 'Name is required' : null,
@@ -50,7 +50,7 @@ router.post('/join-request', async (req, res) => {
 
     const existingTeacher = await Teacher.findOne({ email });
     if (existingTeacher) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Email already exists',
         details: { email: 'This email is already registered' }
       });
@@ -73,9 +73,9 @@ router.post('/join-request', async (req, res) => {
     await teacher.save();
     res.status(201).json(teacher);
   } catch (error) {
-    res.status(400).json({ 
+    res.status(400).json({
       error: error.message,
-      details: error.errors 
+      details: error.errors
     });
   }
 });
@@ -119,7 +119,7 @@ router.post('/login', async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Missing required fields',
         details: {
           email: !email ? 'Email is required' : null,
@@ -148,11 +148,11 @@ router.post('/login', async (req, res) => {
     otpStore[email] = { otp, expires };
 
     // Send OTP via email
-await transporter.sendMail({
-  from: process.env.COMPANY_EMAIL,
-  to: email,
-  subject: "Your One-Time Password (OTP) for Login",
-  text: `Dear Teacher,
+    await transporter.sendMail({
+      from: process.env.COMPANY_EMAIL,
+      to: email,
+      subject: "Your One-Time Password (OTP) for Login",
+      text: `Dear Teacher,
 
 Your secure 6-digit OTP is: ${otp}
 
@@ -162,11 +162,11 @@ If you did not request this OTP, please ignore this message.
 
 Best regards,  
 The Team`,
-});
+    });
 
 
     // Return success but require OTP next (e.g., frontend prompts for OTP)
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'OTP sent to your email. Please enter it to complete login.',
       email: email // For frontend to know which email
     });
@@ -204,10 +204,10 @@ router.post('/verify-otp', async (req, res) => {
     // Fetch teacher data (exclude password)
     const teacher = await Teacher.findOne({ email }).select('-password');
 
-    res.status(200).json({ 
+    res.status(200).json({
       message: 'Login successful',
       token,
-      teacher 
+      teacher
     });
 
   } catch (error) {
