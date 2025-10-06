@@ -148,12 +148,22 @@ router.post('/login', async (req, res) => {
     otpStore[email] = { otp, expires };
 
     // Send OTP via email
-    await transporter.sendMail({
-      from: process.env.COMPANY_EMAIL,
-      to: email,
-      subject: "Your Teacher Login OTP",
-      text: `Hello Teacher, your 6-digit OTP is: ${otp}. It expires in 5 minutes.`,
-    });
+await transporter.sendMail({
+  from: process.env.COMPANY_EMAIL,
+  to: email,
+  subject: "Your One-Time Password (OTP) for Login",
+  text: `Dear Teacher,
+
+Your secure 6-digit OTP is: ${otp}
+
+Please use this code to complete your login. It will expire in 5 minutes for security reasons.
+
+If you did not request this OTP, please ignore this message.
+
+Best regards,  
+The Team`,
+});
+
 
     // Return success but require OTP next (e.g., frontend prompts for OTP)
     res.status(200).json({ 
