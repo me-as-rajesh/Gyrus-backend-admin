@@ -16,7 +16,7 @@ const TestSchema = new mongoose.Schema({
   },
   subject: {
     type: String,
-    default: 'All Subjects'
+    default: 'NEET'
   },
   mcqCount: {
     type: Number,
@@ -25,6 +25,10 @@ const TestSchema = new mongoose.Schema({
   groupId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Group',
+    required: true
+  },
+  standard: {
+    type: String,
     required: true
   },
   createdAt: {

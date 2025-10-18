@@ -21,7 +21,7 @@ router.get('/group-with-tests/:groupId', async (req, res) => {
     const groupId = req.params.groupId;
 
     // 1. Fetch group
-    const group = await Group.findById(groupId).lean(); // lean() returns plain JS object
+    const group = await Group.findById(groupId).lean(); 
 
     if (!group) {
       return res.status(404).json({ success: false, message: 'Group not found' });

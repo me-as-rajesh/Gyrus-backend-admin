@@ -13,6 +13,7 @@ const studentAuthRoutes = require('./routes/studentAuth');
 const reportsRouter = require('./routes/reportsRoutes'); 
 const adminRoutes = require('./routes/adminRoutes');
 const otpRoutes = require('./routes/otpRoutes');
+const McqRoutes = require('./routes/mcqRoutes');
 //const nodeMailRoutes = require('./routes/nodeMail');
 
 // Middleware
@@ -30,6 +31,8 @@ app.use('/api/info', infoRoutes);
 app.use('/api/questions', questionRoutes);
 app.use('/api/student', studentAuthRoutes);
 app.use('/api/otp', otpRoutes);
+app.use('/api/mcq', McqRoutes);
+
 //app.use('/api/email', nodeMailRoutes);
 
 module.exports = app;

@@ -28,13 +28,13 @@ router.get('/', async (req, res) => {
 // @access  Private
 router.post('/', async (req, res) => {
   try {
-    const { testName, date, time, subject, mcqCount, groupId } = req.body;
+    const { testName, date, time, subject, mcqCount, groupId, standard } = req.body;
 
     // Validation
-    if (!testName || !date || !time || !groupId) {
+    if (!testName || !date || !time || !groupId || !standard) {
       return res.status(400).json({ 
         error: 'Missing required fields',
-        required: ['testName', 'date', 'time', 'groupId'] 
+        required: ['testName', 'date', 'time', 'groupId', 'standard'] 
       });
     }
 
@@ -50,7 +50,8 @@ router.post('/', async (req, res) => {
       time,
       subject,
       mcqCount,
-      groupId
+      groupId,
+      standard
     });
 
     await newTest.save();
@@ -89,7 +90,7 @@ router.get('/student', async (req, res) => {
 });
 
 // Get all tests for all groups of a teacher
-router.get('/teacher-tests/arun@gmail.com', async (req, res) => {
+router.get('/teacher-tests/:email', async (req, res) => {
     try {
         const teacherEmail = req.params.teacherEmail;
         

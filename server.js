@@ -11,6 +11,12 @@ const app = require('./app');
 // .then(() => console.log('Connected to MongoDB compass👍 (localhost:27017/gyrus)'))
 // .catch(err => console.error('MongoDB connection error:', err));
 
+
+// mongoose.connect(process.env.MONGODB_URIONE)
+// .then(() => console.log('Connected to MongoDB Atlas👍'))
+// .catch(err => console.error('MongoDB connection error:', err));
+
+
 // // MongoDB Connection using environment variable
 mongoose.connect(process.env.MONGODB_URI)
 .then(() => console.log('Connected to MongoDB Atlas👍'))
