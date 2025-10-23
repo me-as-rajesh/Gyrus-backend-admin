@@ -8,11 +8,11 @@ const jwt = require('jsonwebtoken');
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, // true for port 465
+  port: 587,
+  secure: false, 
   auth: {
     user: process.env.COMPANY_EMAIL,
-    pass: process.env.COMPANY_PASSWORD, // use an App Password, not your normal Gmail password
+    pass: process.env.COMPANY_PASSWORD, 
   },
 });
 

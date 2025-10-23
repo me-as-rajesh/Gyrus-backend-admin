@@ -30,3 +30,6 @@ Thumbs.db
 # IDE/editor
 .vscode/
 .idea/
+
+# specific file (relative path from repo root)
+questions.json
