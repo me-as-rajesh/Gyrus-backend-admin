@@ -16,7 +16,6 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-
 const otpStore = {};
 
 function generateOTP() {

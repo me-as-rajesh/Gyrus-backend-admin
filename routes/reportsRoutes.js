@@ -30,7 +30,17 @@ router.get('/teacher/:email', async (req, res) => {
       ]
     }).sort({ createdAt: -1 });
 
-    return res.json({ status: 'alive', count: reports.length, reports });
+    const enrichedReports = reports.map((report) => {
+      if (report.subjectScores) {
+        return {
+          ...report,
+          subjectScores: report.subjectScores,
+        };
+      }
+      return report;
+    });
+
+    return res.json({ status: 'alive', count: enrichedReports.length, reports: enrichedReports });
   } catch (err) {
     res.status(500).json({ message: err.message, status: 'dead' });
   }
@@ -91,6 +101,17 @@ router.post('/', async (req, res) => {
       timeTaken,
       date
     });
+
+    // Calculate subject scores for NEET
+    if (subject === 'NEET' && Array.isArray(answers)) {
+      const subjectScores = { Physics: 0, Chemistry: 0, Botany: 0, Zoology: 0 };
+      answers.forEach((ans) => {
+        if (ans.subjectName && ans.isCorrect) {
+          subjectScores[ans.subjectName] = (subjectScores[ans.subjectName] || 0) + 1;
+        }
+      });
+      report.subjectScores = subjectScores;
+    }
 
     const newReport = await report.save();
     res.status(201).json(newReport);

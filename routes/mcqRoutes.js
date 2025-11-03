@@ -73,8 +73,23 @@ router.get('/filtered', async (req, res) => {
       .select('_id mcqId question 1 2 3 4 answer explanation subjectId subjectName topicsId topicName standard')
       .limit(10000);
 
-    // Shuffle and slice
-    questions = questions.sort(() => 0.5 - Math.random()).slice(0, count);
+    // Divide NEET questions equally among Physics, Chemistry, Botany, and Zoology if count is 20, 40, 100, or 180
+    if (subject === 'NEET' && [20, 40, 100, 180].includes(count)) {
+      const subjects = ['Physics', 'Chemistry', 'Botany', 'Zoology'];
+      const perSubjectCount = count / 4;
+      const subjectQuestions = await Promise.all(
+        subjects.map(async (sub) => {
+          const subQuery = { ...query, subjectId: subjectMap[sub] };
+          const subQuestions = await Question.find(subQuery)
+            .select('_id mcqId question 1 2 3 4 answer explanation subjectId subjectName topicsId topicName standard')
+            .limit(perSubjectCount);
+          return subQuestions;
+        })
+      );
+      questions = subjectQuestions.flat();
+    } else {
+      questions = questions.sort(() => 0.5 - Math.random()).slice(0, count);
+    }
 
     const transformedQuestions = questions.map((q) => {
       const options = [
